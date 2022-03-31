@@ -14,10 +14,11 @@ Whitespaces : [ \t\r\n]+ -> skip ;
 //Simi: ';';
 //WS: (' '| '\n' |'\r')+ {skip();};
 
-stat: if_stat| declaration | assignment | while_stat ;
+stat: if_stat| declaration | assignment | while_stat | for_state ;
 while_stat: WHILE expr stat_block;
-declaration : Type assignment;
-assignment:  ID ASSIGN expr SCOL;
+for_state : FOR CPAR declaration SCOL expr SCOL increment OPAR stat_block ;
+declaration : Type? assignment (','assignment)* SCOL?;
+assignment:  ID ASSIGN expr ;
 if_stat: IF condition_block (ELSE IF condition_block)* (ELSE stat_block)?;
 condition_block: expr stat_block;
 block:stat*;
@@ -31,6 +32,8 @@ expr: expr POW<assoc=right> expr
 |expr op=(EQ| NEQ)expr
 | expr AND expr
 |expr OR expr |atom;
+
+increment: ID ('++' | '--');
 
 atom:CPAR expr OPAR
 |(INT |FLOAT)
@@ -74,6 +77,7 @@ NIL:'nil';
 IF:'if';
 ELSE:'else';
 WHILE:'while';
+FOR:'for';
 ID: [a-zA-Z_] [a-zA-Z_0-9]*;
 INT:[0-9]+;
 
